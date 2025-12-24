@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  conversor-pdf:
+    build: .
+    container_name: conversor-pdf-sumate
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - ILOVEPDF_PUBLIC_KEY=${ILOVEPDF_PUBLIC_KEY}
+      - ILOVEPDF_SECRET_KEY=${ILOVEPDF_SECRET_KEY}
+      - CONSTRUCTOR_DOCUMENTOS_URL=${CONSTRUCTOR_DOCUMENTOS_URL:-http://constructor-documentos:3003}
+      - DEFAULT_CONVERSION_METHOD=${DEFAULT_CONVERSION_METHOD:-puppeteer}
+      - ENABLE_FALLBACK=${ENABLE_FALLBACK:-true}
+      - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-10}
+      - TEMP_DIR=/tmp/pdf-converter
+      - PUPPETEER_HEADLESS=new
+      - PUPPETEER_TIMEOUT=60000
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX_REQUESTS=100
+    volumes:
+      - pdf-temp:/tmp/pdf-converter
+    networks:
+      - sumate-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.conversor-pdf.rule=Host(`conversor-pdf.sumate.evolvedigital.cloud`)"
+      - "traefik.http.routers.conversor-pdf.entrypoints=websecure"
+      - "traefik.http.routers.conversor-pdf.tls.certresolver=letsencrypt"
+      - "traefik.http.services.conversor-pdf.loadbalancer.server.port=3004"
+
+volumes:
+  pdf-temp:
+    driver: local
+
+networks:
+  sumate-network:
+    external: true
