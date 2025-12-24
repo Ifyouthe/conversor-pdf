@@ -24,7 +24,7 @@ services:
     volumes:
       - pdf-temp:/tmp/pdf-converter
     networks:
-      - sumate-network
+      - backend_global
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.conversor-pdf.rule=Host(`conversor-pdf.sumate.evolvedigital.cloud`)"
@@ -37,5 +37,5 @@ volumes:
     driver: local
 
 networks:
-  sumate-network:
+  backend_global:
     external: true
