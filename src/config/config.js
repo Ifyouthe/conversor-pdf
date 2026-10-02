@@ -30,14 +30,16 @@ const config = {
       '--disable-dev-shm-usage',
       '--disable-accelerated-2d-canvas',
       '--no-first-run',
-      '--no-zygote',
-      '--single-process',
+      // Sin --no-zygote ni --single-process: con Chrome >= 154 (lo que instala
+      // hoy el Dockerfile) el navegador se cierra al arrancar ("Target closed")
       '--disable-gpu'
     ]
   },
 
   // URL del constructor de documentos
-  constructorUrl: process.env.CONSTRUCTOR_DOCUMENTOS_URL || 'http://localhost:3003'
+  constructorUrl: process.env.CONSTRUCTOR_DOCUMENTOS_URL || 'http://localhost:3003',
+  // Secreto del constructor (cabecera X-API-Key) para /convert/from-url y /generate-and-convert
+  constructorApiKey: process.env.CONSTRUCTOR_API_KEY || ''
 };
 
 module.exports = config;

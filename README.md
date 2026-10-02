@@ -57,6 +57,32 @@ npm run dev
 npm start
 ```
 
+## 🔐 Secreto compartido (X-API-Key)
+
+Con `CONVERSOR_API_KEY` definida, toda petición salvo `GET /health` debe traer la cabecera `X-API-Key` con ese valor; si falta o no coincide, **401**. Sin la variable el servicio queda abierto (solo para desarrollo local) y lo avisa al arrancar. Si el conversor llama al constructor (`/api/convert/from-url` con `data`, `/api/generate-and-convert`), le reenvía `CONSTRUCTOR_API_KEY`.
+
+```bash
+curl -X POST http://sumate-conversor:3004/api/convert/image-to-pdf \
+  -H "X-API-Key: $CONVERSOR_API_KEY" -F "image=@foto.jpg" --output foto.pdf
+```
+
+| Variable | Por defecto | Para qué |
+|---|---|---|
+| `CONVERSOR_API_KEY` | vacía (abierto) | Secreto de la cabecera `X-API-Key` |
+| `NODE_ENV` | `production` | En `development` los 500 devuelven el mensaje interno |
+| `CONSTRUCTOR_DOCUMENTOS_URL`, `CONSTRUCTOR_API_KEY` | `http://constructor-documentos:3003`, vacía | Solo para los endpoints que llaman al constructor |
+| `ILOVEPDF_PUBLIC_KEY`, `ILOVEPDF_SECRET_KEY` | vacías | Solo Excel/Word con `ilovepdf` (la Herramienta no los usa) |
+| `MAX_FILE_SIZE_MB` | `10` | Límite de archivo subido |
+| `PORT` | `3004` | |
+
+## 🖥️ Despliegue en el 207
+
+- Rama `refactor/207` (no `main`: `main` se autodespliega en el Dokploy del 195).
+- `docker compose -p sumate-conversor -f docker-compose.yml -f docker-compose.207.yml up -d --build`, con `.env` 600.
+- Contenedor `sumate-conversor`, puerto **3004** sin publicar, solo en la red externa `sumate_servicios` (tiene que existir antes); sistema de archivos de solo lectura con `/tmp` en memoria.
+- La Herramienta: `PDF_CONVERTER_URL=http://sumate-conversor:3004/api/convert/image-to-pdf` y la cabecera `X-API-Key`.
+- Equivalencia: `node scripts/comparar-pdf.js a.pdf b.pdf` compara dos PDFs ignorando solo `CreationDate`/`ModDate`.
+
 ## 📚 API Endpoints
 
 ### Conversión directa de archivos

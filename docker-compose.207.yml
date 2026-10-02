@@ -1,0 +1,28 @@
+# Override del servidor 207 (lo despliega P8; ver README "Despliegue en el 207").
+#   docker compose -p sumate-conversor -f docker-compose.yml -f docker-compose.207.yml up -d --build
+# - Sin puertos publicados: solo lo alcanzan las apps de la red interna
+#   sumate_servicios (la crea la infraestructura del 207, no este compose).
+# - URL para la Herramienta: http://sumate-conversor:3004/api/convert/image-to-pdf
+#   con la cabecera X-API-Key: $CONVERSOR_API_KEY.
+# - /tmp en memoria: ahi van los temporales y el perfil de Chrome (puppeteer).
+services:
+  conversor-pdf:
+    container_name: sumate-conversor
+    environment:
+      - CONSTRUCTOR_DOCUMENTOS_URL=${CONSTRUCTOR_DOCUMENTOS_URL:-http://sumate-constructor:3003}
+      - HOME=/tmp
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+    shm_size: 256m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 1g
+    cpus: 1.5
+    pids_limit: 256
+    networks: [sumate_servicios]
+
+networks:
+  sumate_servicios:
+    external: true
