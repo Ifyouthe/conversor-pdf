@@ -238,7 +238,8 @@ router.post('/convert/from-url', async (req, res) => {
       const response = await axios.post(constructorUrl, data, {
         responseType: 'arraybuffer',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(config.constructorApiKey ? { 'X-API-Key': config.constructorApiKey } : {})
         }
       });
 
@@ -305,7 +306,8 @@ router.post('/generate-and-convert', async (req, res) => {
     const excelResponse = await axios.post(constructorUrl, data, {
       responseType: 'arraybuffer',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(config.constructorApiKey ? { 'X-API-Key': config.constructorApiKey } : {})
       }
     });
 

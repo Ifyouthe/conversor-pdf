@@ -16,6 +16,7 @@ require('dotenv').config();
 const excelToPdfService = require('./src/services/excelToPdfService');
 const wordToPdfService = require('./src/services/wordToPdfService');
 const conversionController = require('./src/controllers/conversionController');
+const { crearApiKeyMiddleware } = require('./src/middleware/apiKey');
 
 const app = express();
 const PORT = process.env.PORT || 3004;
@@ -69,6 +70,11 @@ app.use(helmet({
 app.use(cors({
   origin: ['https://sumate.evolvedigital.cloud', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3003'],
   credentials: true
+}));
+
+// Secreto compartido (X-API-Key) en todo salvo /health
+app.use(crearApiKeyMiddleware(process.env.CONVERSOR_API_KEY, {
+  log: { warn: (m) => console.warn(`[SEGURIDAD] ⚠️ ${m}`) }
 }));
 
 // Rate limiting

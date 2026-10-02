@@ -56,7 +56,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependencias de producción
-RUN npm ci --only=production
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Deshabilitar el sandbox de Chrome para Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
